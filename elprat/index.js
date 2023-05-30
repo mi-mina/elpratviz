@@ -30,33 +30,20 @@ const coord = {
 };
 const center = { x: svgWidth / 2, y: svgHeight / 2 };
 const duration = 1500;
-let state = "IES";
+let state = "All";
 
 function init(files) {
   const dataRaw = files[0];
-  console.log("dataRaw", dataRaw);
+  // console.log("dataRaw", dataRaw);
 
   const musicGenres = getDistinctElements(dataRaw, d => d.music_genre);
-  console.log("musicGenres", musicGenres);
+  // console.log("musicGenres", musicGenres);
 
   const data = formatData(dataRaw, musicGenres);
   console.log("data", data);
 
   const dataByIESID = getDataByIESID(data, musicGenres);
-  console.log("dataByIESID", dataByIESID);
-
-  const IESIDs = getDistinctElements(dataRaw, d => d.IES_ID);
-
-  // const simulation = d3
-  //   .forceSimulation(nodes)
-  //   // .on("tick", tick)
-  //   .force(
-  //     "collide",
-  //     d3.forceCollide().radius(d => 1 + d.r)
-  //   )
-  //   .force("x", d3.forceX(0).strength(0.001))
-  //   .force("y", d3.forceY(0).strength(0.001));
-  // // .stop();
+  // console.log("dataByIESID", dataByIESID);
 
   // Scales ////////////////////////////////////////////////////////////////
   const musicGenreColorScale = d3
@@ -138,15 +125,14 @@ function init(files) {
   feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
   // Draw /////////////////////////////////////////////////////////////////////
-  drawStarByIES(dataByIESID);
+  drawStars(dataByIESID);
 
   d3.select("body").on("click", () => update());
 
   function update() {
-    console.log("calling update");
     if (state === "IES") {
-      console.log("state", state);
       state = "All";
+
       d3.selectAll(".IESContainer")
         .transition()
         .duration(duration)
@@ -158,7 +144,17 @@ function init(files) {
       d3.selectAll(".IESCircle")
         .transition()
         .duration(duration)
-        .attr("stroke-opacity", 0);
+        .attr("r", d => d.allStarR);
+
+      d3.selectAll(".IESName")
+        .transition()
+        .duration(duration)
+        .style("opacity", 0);
+
+      d3.select("#elPratName")
+        .transition()
+        .duration(duration)
+        .style("opacity", 1);
 
       d3.selectAll(".IESContainer")
         .selectAll(".rays")
@@ -178,9 +174,8 @@ function init(files) {
           return cy;
         });
     } else if (state === "All") {
-      console.log("state", state);
-
       state = "IES";
+
       d3.selectAll(".IESContainer")
         .transition()
         .duration(duration)
@@ -192,7 +187,17 @@ function init(files) {
       d3.selectAll(".IESCircle")
         .transition()
         .duration(duration)
-        .attr("stroke-opacity", 1);
+        .attr("r", d => d.IESStarR);
+
+      d3.selectAll(".IESName")
+        .transition()
+        .duration(duration)
+        .style("opacity", 1);
+
+      d3.select("#elPratName")
+        .transition()
+        .duration(duration)
+        .style("opacity", 0);
 
       d3.selectAll(".IESContainer")
         .selectAll(".rays")
@@ -214,7 +219,7 @@ function init(files) {
     }
   }
 
-  function drawStarByIES(data) {
+  function drawStars(data) {
     const IESArray = Object.values(data);
 
     const chartContainer = svg
@@ -223,29 +228,50 @@ function init(files) {
       .enter()
       .append("g")
       .attr("class", "IESContainer")
-      .attr("transform", d => `translate(${d.IESCoords.x}, ${d.IESCoords.y})`);
+      .attr("transform", d => `translate(${d.allCoords.x}, ${d.allCoords.y})`);
 
+    // Inner circle
     chartContainer
       .append("circle")
       .attr("class", "IESCircle")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", d => d.IESStarR)
+      .attr("r", d => d.allStarR)
       .style("fill", "none")
       .style("stroke", "lightGrey")
       .style("stroke-width", "2px")
       .style("stroke-dasharray", "3, 3");
 
+    // IES Name
     chartContainer
       .append("text")
+      .attr("class", "IESName")
       .attr("x", 0)
       .attr("y", 0)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
+      .style("font", `${svgWidth * 0.01}px Arial`)
+      .style("fill", "#fff")
+      .style("opacity", 0)
+      .text(d => d.name)
+      .call(text => {
+        text.each(function (d) {
+          wrap(d3.select(this), d.IESStarR * 2 - paddingH, "middle");
+        });
+      });
+
+    // El Prat Name
+    svg
+      .append("text")
+      .attr("id", "elPratName")
+      .attr("x", svgWidth / 2)
+      .attr("y", svgHeight / 2)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
       .style("font", "14px Arial")
-      .style("fill", "#000")
-      .text(d => d.name);
-    // .call(text => wrap(text, d.IESStarR * 2 - paddingH, "middle"));
+      .style("fill", "#fff")
+      .style("opacity", 1)
+      .text(d => "El Prat");
 
     const rays = chartContainer
       .selectAll(".rays")
@@ -264,14 +290,14 @@ function init(files) {
       .attr("id", d => `${d.music_genre}-IES${d.IES_ID}-${d.loop_name}`)
       .attr("cx", d => {
         const r =
-          d.IESStarR + paddingR + songR + (paddingR + songR * 2) * d.IESIndex;
-        const cx = r * Math.cos(d.IESAngle);
+          d.allStarR + paddingR + songR + (paddingR + songR * 2) * d.allIndex;
+        const cx = r * Math.cos(d.allAngle);
         return cx;
       })
       .attr("cy", d => {
         const r =
-          d.IESStarR + paddingR + songR + (paddingR + songR * 2) * d.IESIndex;
-        const cy = r * Math.sin(d.IESAngle);
+          d.allStarR + paddingR + songR + (paddingR + songR * 2) * d.allIndex;
+        const cy = r * Math.sin(d.allAngle);
         return cy;
       })
       .attr("r", songR)
@@ -312,7 +338,18 @@ function getStarInnerRadius(data) {
 }
 
 function formatData(data, musicGenres) {
-  const allSongsStar = getSongsDistribution(data, musicGenres);
+  // const simulation = d3
+  //   .forceSimulation(nodes)
+  //   // .force("charge", d3.forceManyBody().strength(5))
+  //   .force(
+  //     "collide",
+  //     d3.forceCollide().radius(d => 2 + d.r)
+  //   )
+  //   .force("x", d3.forceX(svgWidth / 2))
+  //   .force("y", d3.forceY(svgHeight / 2))
+  //   .on("tick", ticked);
+
+  const allSongsStar = getSongsDistribution(data, musicGenres).songsArray;
   console.log("allSongsStar", allSongsStar);
 
   // Get Star inner radius when the songs are all together
@@ -335,7 +372,10 @@ function formatData(data, musicGenres) {
   IESIDs.forEach(IESID => {
     const thisIESSonsData = data.filter(d => d.IES_ID === IESID);
 
-    const IESSongsStar = getSongsDistribution(thisIESSonsData, musicGenres);
+    const IESSongsStar = getSongsDistribution(
+      thisIESSonsData,
+      musicGenres
+    ).songsArray;
 
     // Get Star inner radius when the songs are by IES
     const IESSongsStarR =
@@ -357,15 +397,16 @@ function formatData(data, musicGenres) {
 }
 
 function getSongsDistribution(data, musicGenres) {
-  const containerArray = [];
+  const songsArray = [];
   musicGenres.forEach(musicGenre => {
     const array = data.filter(d => d.music_genre === musicGenre);
     const threshold = getThreshold(array);
     if (array.length !== 0) {
-      containerArray.push(chunk(array, threshold));
+      songsArray.push(chunk(array, threshold));
     }
   });
-  return containerArray.flat();
+
+  return { songsArray: songsArray.flat(), genresArray: songsArray };
 }
 
 function getDataByIESID(data, musicGenres) {
@@ -382,7 +423,10 @@ function getDataByIESID(data, musicGenres) {
     thisIES.allStarR = thisIESSonsData[0].allStarR;
     thisIES.IESCoords = coord[IESID];
     thisIES.allCoords = center;
-    thisIES.songs = getSongsDistribution(thisIESSonsData, musicGenres);
+    thisIES.songs = getSongsDistribution(
+      thisIESSonsData,
+      musicGenres
+    ).songsArray;
   });
 
   return dataByIESID;
@@ -446,3 +490,20 @@ function wrap(text, width, verticalAllignment) {
     }
   });
 }
+
+// const nodes = [{ r: 75 }, { r: 90 }, { r: 35 }, { r: 90 }, { r: 50 }];
+
+// function ticked() {
+//   svg
+//     .selectAll("circle")
+//     .data(nodes)
+//     .join("circle")
+//     .attr("r", d => d.r)
+//     .style("fill", "pink")
+//     .attr("cx", function (d) {
+//       return d.x;
+//     })
+//     .attr("cy", function (d) {
+//       return d.y;
+//     });
+// }
