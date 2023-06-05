@@ -22,78 +22,209 @@ const minStarR = windowWidth * 0.02;
 const paddingR = 6;
 const paddingH = 8;
 const coord = {
-  1: { x: svgWidth / 6, y: svgHeight / 4 },
-  2: { x: (svgWidth / 6) * 3, y: svgHeight / 4 },
-  3: { x: (svgWidth / 6) * 5, y: svgHeight / 4 },
-  4: { x: svgWidth / 3, y: (svgHeight / 4) * 2.8 },
-  5: { x: (svgWidth / 3) * 2, y: (svgHeight / 4) * 2.8 },
+  1: { x: svgWidth / 6 - svgWidth / 2, y: svgHeight / 4 - svgHeight / 2 },
+  2: { x: (svgWidth / 6) * 3 - svgWidth / 2, y: svgHeight / 4 - svgHeight / 2 },
+  3: { x: (svgWidth / 6) * 5 - svgWidth / 2, y: svgHeight / 4 - svgHeight / 2 },
+  4: {
+    x: svgWidth / 3 - svgWidth / 2,
+    y: (svgHeight / 4) * 2.8 - svgHeight / 2,
+  },
+  5: {
+    x: (svgWidth / 3) * 2 - svgWidth / 2,
+    y: (svgHeight / 4) * 2.8 - svgHeight / 2,
+  },
 };
 const center = { x: svgWidth / 2, y: svgHeight / 2 };
 const duration = 1500;
+const halfDuration = 750;
 let state = "All";
 
 function init(files) {
   const dataRaw = files[0];
   // console.log("dataRaw", dataRaw);
 
-  const musicGenres = getDistinctElements(dataRaw, d => d.music_genre);
-  // console.log("musicGenres", musicGenres);
+  // const musicGenres = getDistinctElements(dataRaw, d => d.music_genre);
+  // console.log("musicGenres", JSON.stringify(musicGenres));
 
-  const data = formatData(dataRaw, musicGenres);
+  const musicGenres = [
+    "",
+    "New Age",
+    "Alternativa",
+    "Rock",
+    "Hard rock",
+    "Punk",
+    "Pop",
+    "Pop en español",
+    "J-Pop",
+    "K-Pop",
+    "Electrónica",
+    "Dance",
+    "House",
+    "Afro-beat",
+    "Beatbox",
+    "Hip-Hop",
+    "Hip-hop del Reino Unido",
+    "Hip-hop/Rap",
+    "Rap",
+    "Latin rap",
+    "Latino",
+    "Urbano latino",
+    "Música latina",
+    "Salsa y Tropical",
+    "Reggaeton, flamenco",
+    "Flamenco",
+    "Reggae",
+    "Dubstep",
+    "R&B/Soul",
+    "Downtempo",
+    "Cantautores",
+    "Música para niños",
+    "Músicas del mundo",
+    "Gospel y música cristiana",
+    "Musicales",
+    "Banda sonora",
+    "Futbol",
+    "Publicidad",
+  ];
+  //   "Afro-beat",
+  //   "New Age",
+  //   "Dance",
+  //   "House",
+  //   "Electrónica",
+  //   "beatbox",
+  //   "Rock",
+  //   "Hard rock",
+  //   "Punk",
+  //   "Alternativa",
+  //   "Alternative",
+  //   "Pop",
+  //   "Pop en español",
+  //   "K-Pop",
+  //   "J-Pop",
+  //   "Salsa y Tropical",
+  //   "Urbano latino",
+  //   "Latino",
+  //   "Música latina",
+  //   "Hip-Hop",
+  //   "Hip-hop/Rap",
+  //   "Hip-Hop/Rap",
+  //   "Hip-hop del Reino Unido",
+  //   "Rap",
+  //   "Latin rap",
+  //   "Reggaeton, flamenco",
+  //   "flamenco",
+  //   "Flamenco",
+  //   "Futbol",
+  //   "Downtempo",
+  //   "musica infantil",
+  //   "Músicas del mundo",
+  //   "R&B/Soul",
+  //   "Reggae",
+  //   "Dubstep",
+  //   "Música para niños",
+  //   "Cantautores",
+  //   "Gospel y música cristiana",
+  //   "futbol",
+  //   "Musicales",
+  //   "Banda sonora",
+  //   "publicidad",
+  // ];
+
+  const data = formatSongsData(dataRaw, musicGenres);
   console.log("data", data);
+  console.log("musicGenres", musicGenres.length);
+
+  const genresData = formatGenresData(data, musicGenres);
 
   const dataByIESID = getDataByIESID(data, musicGenres);
   // console.log("dataByIESID", dataByIESID);
 
   // Scales ////////////////////////////////////////////////////////////////
+  const colors1 = [
+    "#5cecb5",
+    "#008c6c",
+    "#02a3f9",
+    "#00539c",
+    "#027feb",
+    "#a9b4ff",
+    "#9985ff",
+    "#d097ff",
+    "#954abd",
+    "#dea9ec",
+    "#f2a9ff",
+    "#e16edd",
+    "#86007a",
+    "#ffa5e2",
+    "#ff6ecf",
+    "#9e216f",
+    "#952b36",
+    "#eb4557",
+    "#ff8a7c",
+    "#914135",
+    "#f9634e",
+    "#b74108",
+    "#ff9c5e",
+    "#824700",
+    "#ffb246",
+    "#fbce6e",
+    "#e3b82f",
+    "#7d7700",
+    "#92b72a",
+    "#7e9048",
+    "#558f00",
+    "#a2e676",
+    "#aee296",
+    "#006604",
+    "#69eb84",
+    "#01bc69",
+    "#01b37d",
+    "#008a61",
+  ];
+  const colors = [
+    "#aafd21",
+    "#71a92f",
+    "#b5fb82",
+    "#80ff54",
+    "#b9f9a3",
+    "#74a66c",
+    "#02d53f",
+    "#00b65c",
+    "#01ec84",
+    "#24ae7d",
+    "#1cffbe",
+    "#7bbaa0",
+    "#b3f6dc",
+    "#7cffd8",
+    "#97fae4",
+    "#01b09c",
+    "#01e9d7",
+    "#02aad3",
+    "#8bd1ff",
+    "#799adb",
+    "#c37ee5",
+    "#e7b0ff",
+    "#ff9ade",
+    "#ff6dab",
+    "#fc6d50",
+    "#ffc39c",
+    "#cb8c5f",
+    "#ff8e0b",
+    "#ffaf4c",
+    "#ffac33",
+    "#c19149",
+    "#ffd87c",
+    "#b59829",
+    "#fce6ad",
+    "#ffe754",
+    "#acba00",
+    "#e5f15d",
+    "#d1f586",
+  ];
+  console.log("colors", colors.length);
   const musicGenreColorScale = d3
     .scaleOrdinal()
     .domain(musicGenres)
-    .range([
-      "#5cecb5",
-      "#008c6c",
-      "#02a3f9",
-      "#00539c",
-      "#027feb",
-      "#a9b4ff",
-      "#002e76",
-      "#9985ff",
-      "#2e0e69",
-      "#d097ff",
-      "#954abd",
-      "#dea9ec",
-      "#f2a9ff",
-      "#e16edd",
-      "#86007a",
-      "#ffa5e2",
-      "#ff6ecf",
-      "#9e216f",
-      "#952b36",
-      "#eb4557",
-      "#8c0021",
-      "#ff8a7c",
-      "#914135",
-      "#f9634e",
-      "#990005",
-      "#6a1f00",
-      "#b74108",
-      "#ff9c5e",
-      "#824700",
-      "#ffb246",
-      "#fbce6e",
-      "#e3b82f",
-      "#7d7700",
-      "#92b72a",
-      "#7e9048",
-      "#558f00",
-      "#a2e676",
-      "#aee296",
-      "#006604",
-      "#69eb84",
-      "#01bc69",
-      "#01b37d",
-      "#008a61",
-    ]);
+    .range(colors);
 
   // Containers ////////////////////////////////////////////////////////////////
   const svg = d3
@@ -102,8 +233,11 @@ function init(files) {
     .attr("width", svgWidth)
     .attr("height", svgHeight);
 
-  // Glow ////////////////////////////////////////////////////////////////
+  const chartContainer = svg
+    .append("g")
+    .attr("transform", d => `translate(${svgWidth / 2}, ${svgHeight / 2})`);
 
+  // Glow ////////////////////////////////////////////////////////////////
   const defs = svg.append("defs");
 
   const filter = defs
@@ -125,7 +259,7 @@ function init(files) {
   feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
   // Draw /////////////////////////////////////////////////////////////////////
-  drawStars(dataByIESID);
+  drawStars(dataByIESID, genresData);
 
   d3.select("body").on("click", () => update());
 
@@ -136,10 +270,7 @@ function init(files) {
       d3.selectAll(".IESContainer")
         .transition()
         .duration(duration)
-        .attr(
-          "transform",
-          d => `translate(${d.allCoords.x}, ${d.allCoords.y})`
-        );
+        .attr("transform", d => `translate(0,0)`);
 
       d3.selectAll(".IESCircle")
         .transition()
@@ -150,6 +281,11 @@ function init(files) {
         .transition()
         .duration(duration)
         .style("opacity", 0);
+
+      d3.selectAll(".musicGenresLabels")
+        .transition()
+        .duration(duration)
+        .style("opacity", 1);
 
       d3.select("#elPratName")
         .transition()
@@ -194,9 +330,14 @@ function init(files) {
         .duration(duration)
         .style("opacity", 1);
 
+      d3.selectAll(".musicGenresLabels")
+        .transition()
+        .duration(halfDuration)
+        .style("opacity", 0);
+
       d3.select("#elPratName")
         .transition()
-        .duration(duration)
+        .duration(halfDuration)
         .style("opacity", 0);
 
       d3.selectAll(".IESContainer")
@@ -219,31 +360,57 @@ function init(files) {
     }
   }
 
-  function drawStars(data) {
-    const IESArray = Object.values(data);
+  function drawStars(dataByIESID, genresData) {
+    const IESArray = Object.values(dataByIESID);
 
-    const chartContainer = svg
+    const ies = chartContainer
       .selectAll(".IESContainer")
       .data(IESArray)
       .enter()
       .append("g")
-      .attr("class", "IESContainer")
-      .attr("transform", d => `translate(${d.allCoords.x}, ${d.allCoords.y})`);
+      .attr("class", "IESContainer");
+
+    // Music genres items
+    const genresItems = chartContainer
+      .selectAll(".musicGenresLabels")
+      .data(genresData)
+      .enter()
+      .append("g")
+      .attr("class", "musicGenresLabels")
+      .attr("transform", d => {
+        const r = 250;
+        const x = r * Math.cos(d.angle);
+        const y = r * Math.sin(d.angle);
+        return `translate(${x}, ${y})`;
+      });
+
+    // Music genres names
+    genresItems
+      .append("text")
+      .attr("transform", d => {
+        return `rotate(${d.angle * (180 / Math.PI)})`;
+      })
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "start")
+      .style("font", `${svgWidth * 0.01}px Arial`)
+      .style("fill", d => musicGenreColorScale(d.musicGenreName))
+      .style("opacity", 1)
+      .text(d => d.musicGenreName);
 
     // Inner circle
-    chartContainer
+    ies
       .append("circle")
       .attr("class", "IESCircle")
       .attr("cx", 0)
       .attr("cy", 0)
       .attr("r", d => d.allStarR)
       .style("fill", "none")
-      .style("stroke", "lightGrey")
+      .style("stroke", "grey")
       .style("stroke-width", "2px")
       .style("stroke-dasharray", "3, 3");
 
     // IES Name
-    chartContainer
+    ies
       .append("text")
       .attr("class", "IESName")
       .attr("x", 0)
@@ -273,7 +440,7 @@ function init(files) {
       .style("opacity", 1)
       .text(d => "El Prat");
 
-    const rays = chartContainer
+    const rays = ies
       .selectAll(".rays")
       .data(d => d.songs)
       .enter()
@@ -337,7 +504,7 @@ function getStarInnerRadius(data) {
   );
 }
 
-function formatData(data, musicGenres) {
+function formatSongsData(data, musicGenres) {
   // const simulation = d3
   //   .forceSimulation(nodes)
   //   // .force("charge", d3.forceManyBody().strength(5))
@@ -349,7 +516,7 @@ function formatData(data, musicGenres) {
   //   .force("y", d3.forceY(svgHeight / 2))
   //   .on("tick", ticked);
 
-  const allSongsStar = getSongsDistribution(data, musicGenres).songsArray;
+  const allSongsStar = getSongsDistribution(data, musicGenres).raysArray;
   console.log("allSongsStar", allSongsStar);
 
   // Get Star inner radius when the songs are all together
@@ -375,7 +542,7 @@ function formatData(data, musicGenres) {
     const IESSongsStar = getSongsDistribution(
       thisIESSonsData,
       musicGenres
-    ).songsArray;
+    ).raysArray;
 
     // Get Star inner radius when the songs are by IES
     const IESSongsStarR =
@@ -396,17 +563,45 @@ function formatData(data, musicGenres) {
   return data;
 }
 
+function formatGenresData(data, musicGenres) {
+  const songsDistributions = getSongsDistribution(data, musicGenres);
+  const numberOfRays = songsDistributions.raysArray.length;
+  const angleUnit = (2 * Math.PI) / numberOfRays;
+
+  const musicGenresItems = songsDistributions.genresArray.map((o, i, array) => {
+    const angle =
+      array
+        .map(a => a.length)
+        .reduce((acc, curr, index) => {
+          if (index < i) {
+            return acc + curr;
+          } else if (index === i) {
+            return acc + (curr - 1) / 2;
+          } else {
+            return acc;
+          }
+        }, 0) * angleUnit;
+
+    const musicGenresItem = {};
+    musicGenresItem.musicGenreName = o.flat()[0]["music_genre"];
+    musicGenresItem.angle = angle;
+    return musicGenresItem;
+  });
+
+  return musicGenresItems;
+}
+
 function getSongsDistribution(data, musicGenres) {
-  const songsArray = [];
+  const raysArray = [];
   musicGenres.forEach(musicGenre => {
     const array = data.filter(d => d.music_genre === musicGenre);
     const threshold = getThreshold(array);
     if (array.length !== 0) {
-      songsArray.push(chunk(array, threshold));
+      raysArray.push(chunk(array, threshold));
     }
   });
 
-  return { songsArray: songsArray.flat(), genresArray: songsArray };
+  return { raysArray: raysArray.flat(), genresArray: raysArray };
 }
 
 function getDataByIESID(data, musicGenres) {
@@ -426,7 +621,7 @@ function getDataByIESID(data, musicGenres) {
     thisIES.songs = getSongsDistribution(
       thisIESSonsData,
       musicGenres
-    ).songsArray;
+    ).raysArray;
   });
 
   return dataByIESID;
