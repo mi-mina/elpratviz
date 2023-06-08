@@ -1,3 +1,11 @@
+// TODO list
+// - Meter imagen alumnxs
+// - Meter aspa para cerrar song info
+// - Al hacer click sobre el video cover se abre el video en otra página. Poner triángulo
+// - Colocar los circulos de los IES según force simulation
+// - Actualizar los textos
+// - Meter logos
+
 function loadData() {
   const files = [d3.csv(`data/el_prat_song_data.csv`)];
 
@@ -21,6 +29,7 @@ const songR = 4;
 const minStarR = windowWidth * 0.02;
 const paddingR = 6;
 const paddingH = 8;
+let allSongsStarR;
 const coord = {
   1: { x: svgWidth / 6 - svgWidth / 2, y: svgHeight / 4 - svgHeight / 2 },
   2: { x: (svgWidth / 6) * 3 - svgWidth / 2, y: svgHeight / 4 - svgHeight / 2 },
@@ -37,7 +46,8 @@ const coord = {
 const center = { x: svgWidth / 2, y: svgHeight / 2 };
 const duration = 1500;
 const halfDuration = 750;
-let state = "All";
+let vizState = "All";
+let selectedSong;
 
 function init(files) {
   const dataRaw = files[0];
@@ -132,7 +142,7 @@ function init(files) {
 
   const data = formatSongsData(dataRaw, musicGenres);
   console.log("data", data);
-  console.log("musicGenres", musicGenres.length);
+  // console.log("musicGenres", musicGenres.length);
 
   const genresData = formatGenresData(data, musicGenres);
 
@@ -220,7 +230,7 @@ function init(files) {
     "#e5f15d",
     "#d1f586",
   ];
-  console.log("colors", colors.length);
+  // console.log("colors", colors.length);
   const musicGenreColorScale = d3
     .scaleOrdinal()
     .domain(musicGenres)
@@ -231,7 +241,8 @@ function init(files) {
     .select("#graph")
     .append("svg")
     .attr("width", svgWidth)
-    .attr("height", svgHeight);
+    .attr("height", svgHeight)
+    .style("user-select", "none");
 
   const chartContainer = svg
     .append("g")
@@ -261,104 +272,7 @@ function init(files) {
   // Draw /////////////////////////////////////////////////////////////////////
   drawStars(dataByIESID, genresData);
 
-  d3.select("body").on("click", () => update());
-
-  function update() {
-    if (state === "IES") {
-      state = "All";
-
-      d3.selectAll(".IESContainer")
-        .transition()
-        .duration(duration)
-        .attr("transform", d => `translate(0,0)`);
-
-      d3.selectAll(".IESCircle")
-        .transition()
-        .duration(duration)
-        .attr("r", d => d.allStarR);
-
-      d3.selectAll(".IESName")
-        .transition()
-        .duration(duration)
-        .style("opacity", 0);
-
-      d3.selectAll(".musicGenresLabels")
-        .transition()
-        .duration(duration)
-        .style("opacity", 1);
-
-      d3.select("#elPratName")
-        .transition()
-        .duration(duration)
-        .style("opacity", 1);
-
-      d3.selectAll(".IESContainer")
-        .selectAll(".rays")
-        .selectAll(".songs")
-        .transition()
-        .duration(duration)
-        .attr("cx", d => {
-          const r =
-            d.allStarR + paddingR + songR + (paddingR + songR * 2) * d.allIndex;
-          const cx = r * Math.cos(d.allAngle);
-          return cx;
-        })
-        .attr("cy", d => {
-          const r =
-            d.allStarR + paddingR + songR + (paddingR + songR * 2) * d.allIndex;
-          const cy = r * Math.sin(d.allAngle);
-          return cy;
-        });
-    } else if (state === "All") {
-      state = "IES";
-
-      d3.selectAll(".IESContainer")
-        .transition()
-        .duration(duration)
-        .attr(
-          "transform",
-          d => `translate(${d.IESCoords.x}, ${d.IESCoords.y})`
-        );
-
-      d3.selectAll(".IESCircle")
-        .transition()
-        .duration(duration)
-        .attr("r", d => d.IESStarR);
-
-      d3.selectAll(".IESName")
-        .transition()
-        .duration(duration)
-        .style("opacity", 1);
-
-      d3.selectAll(".musicGenresLabels")
-        .transition()
-        .duration(halfDuration)
-        .style("opacity", 0);
-
-      d3.select("#elPratName")
-        .transition()
-        .duration(halfDuration)
-        .style("opacity", 0);
-
-      d3.selectAll(".IESContainer")
-        .selectAll(".rays")
-        .selectAll(".songs")
-        .transition()
-        .duration(duration)
-        .attr("cx", d => {
-          const r =
-            d.IESStarR + paddingR + songR + (paddingR + songR * 2) * d.IESIndex;
-          const cx = r * Math.cos(d.IESAngle);
-          return cx;
-        })
-        .attr("cy", d => {
-          const r =
-            d.IESStarR + paddingR + songR + (paddingR + songR * 2) * d.IESIndex;
-          const cy = r * Math.sin(d.IESAngle);
-          return cy;
-        });
-    }
-  }
+  svg.on("click", () => update());
 
   function drawStars(dataByIESID, genresData) {
     const IESArray = Object.values(dataByIESID);
@@ -378,7 +292,10 @@ function init(files) {
       .append("g")
       .attr("class", "musicGenresLabels")
       .attr("transform", d => {
-        const r = 250;
+        const r =
+          allSongsStarR +
+          songR * 2 * d.rayHeight +
+          paddingR * (d.rayHeight + 1);
         const x = r * Math.cos(d.angle);
         const y = r * Math.sin(d.angle);
         return `translate(${x}, ${y})`;
@@ -388,10 +305,16 @@ function init(files) {
     genresItems
       .append("text")
       .attr("transform", d => {
-        return `rotate(${d.angle * (180 / Math.PI)})`;
+        if (d.angle < Math.PI / 2 || d.angle > (3 * Math.PI) / 2)
+          return `rotate(${d.angle * (180 / Math.PI)})`;
+        else return `rotate(${(d.angle + Math.PI) * (180 / Math.PI)})`;
       })
       .attr("dy", "0.35em")
-      .attr("text-anchor", "start")
+      .attr("text-anchor", d => {
+        if (d.angle < Math.PI / 2 || d.angle > (3 * Math.PI) / 2)
+          return "start";
+        else return "end";
+      })
       .style("font", `${svgWidth * 0.01}px Arial`)
       .style("fill", d => musicGenreColorScale(d.musicGenreName))
       .style("opacity", 1)
@@ -403,7 +326,7 @@ function init(files) {
       .attr("class", "IESCircle")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", d => d.allStarR)
+      .attr("r", d => d.allStarR - svgWidth * 0.01)
       .style("fill", "none")
       .style("stroke", "grey")
       .style("stroke-width", "2px")
@@ -427,18 +350,85 @@ function init(files) {
         });
       });
 
-    // El Prat Name
-    svg
+    // Song info
+    const songInfoContainer = chartContainer
+      .append("g")
+      .attr("id", "songInfoContainer")
+      .style("opacity", 0);
+
+    const videoWidth = allSongsStarR;
+    const videoHeight = videoWidth / 1.77;
+
+    // background Circle
+    songInfoContainer
+      .append("circle")
+      .attr("id", "backgroundCircle")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", allSongsStarR - svgWidth * 0.01)
+      .style("fill", "#171717");
+
+    // IES name
+    songInfoContainer
       .append("text")
-      .attr("id", "elPratName")
-      .attr("x", svgWidth / 2)
-      .attr("y", svgHeight / 2)
+      .attr("id", "IESName")
+      .attr("x", 0)
+      .attr("y", -videoHeight / 2 - videoWidth * 0.17)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
+      .style("font", "16px Arial")
+      .style("fill", "#c2c2c2");
+
+    // Song cover
+    songInfoContainer
+      .append("svg:image")
+      .attr("id", "songCover")
+      .attr("x", -videoWidth * 0.2 - videoHeight - videoWidth * 0.04)
+      .attr("y", -videoHeight / 2)
+      .attr("width", videoHeight)
+      .attr("height", videoHeight);
+
+    // Video cover
+    songInfoContainer
+      .append("svg:image")
+      .attr("id", "videoCover")
+      .attr("x", -videoWidth * 0.2)
+      .attr("y", -videoHeight / 2)
+      .attr("width", videoWidth)
+      .attr("height", videoHeight);
+
+    // Song name
+    songInfoContainer
+      .append("text")
+      .attr("id", "songName")
+      .attr("x", -videoWidth * 0.2)
+      .attr("y", videoHeight / 2 + videoWidth * 0.05)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "start")
+      .style("font", "12px Arial")
+      .style("fill", "#fff");
+
+    // Artist name
+    songInfoContainer
+      .append("text")
+      .attr("id", "artistName")
+      .attr("x", -videoWidth * 0.2)
+      .attr("y", videoHeight / 2 + videoWidth * 0.15)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "start")
       .style("font", "14px Arial")
-      .style("fill", "#fff")
-      .style("opacity", 1)
-      .text(d => "El Prat");
+      .style("fill", "#fff");
+
+    // Music genre
+    songInfoContainer
+      .append("text")
+      .attr("id", "musicGenre")
+      .attr("x", -videoWidth * 0.2)
+      .attr("y", videoHeight / 2 + videoWidth * 0.3)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "start")
+      .style("font", "18px Arial")
+      .style("fill", "#fff");
 
     const rays = ies
       .selectAll(".rays")
@@ -447,28 +437,195 @@ function init(files) {
       .append("g")
       .attr("class", "rays");
 
-    rays
+    const songCircles = rays
       .selectAll(".songs")
       .data(d => d)
       .enter()
-      .append("circle")
+      .append("g")
       .attr("class", "songs")
-      .style("filter", "url(#glow)")
-      .attr("id", d => `${d.music_genre}-IES${d.IES_ID}-${d.loop_name}`)
-      .attr("cx", d => {
+      .attr("transform", d => {
         const r =
           d.allStarR + paddingR + songR + (paddingR + songR * 2) * d.allIndex;
         const cx = r * Math.cos(d.allAngle);
-        return cx;
-      })
-      .attr("cy", d => {
-        const r =
-          d.allStarR + paddingR + songR + (paddingR + songR * 2) * d.allIndex;
         const cy = r * Math.sin(d.allAngle);
-        return cy;
+        return `translate(${cx}, ${cy})`;
       })
+      .call(song => showSongInfo(song));
+
+    songCircles
+      .append("circle")
+      .attr("class", "songSelected")
+      .attr("id", d => `song_${d.IES_ID}_${d.loop_ID}`)
+      .attr("r", songR + 5)
+      .style("pointer-events", "all")
+      .style("fill", "none")
+      .style("stroke", d => musicGenreColorScale(d.music_genre))
+      .style("stroke-opacity", 0);
+
+    songCircles
+      .append("circle")
+      .style("filter", "url(#glow)")
+      .attr("id", d => `${d.music_genre}-IES${d.IES_ID}-${d.loop_name}`)
       .attr("r", songR)
       .style("fill", d => musicGenreColorScale(d.music_genre));
+  }
+
+  function update() {
+    if (vizState === "IES") {
+      vizState = "All";
+
+      d3.selectAll(".IESContainer")
+        .transition()
+        .duration(duration)
+        .attr("transform", d => `translate(0,0)`);
+
+      d3.selectAll(".IESCircle")
+        .transition()
+        .duration(duration)
+        .attr("r", d => d.allStarR);
+
+      d3.selectAll(".IESName")
+        .transition()
+        .duration(duration)
+        .style("opacity", 0);
+
+      d3.selectAll(".musicGenresLabels")
+        .transition()
+        .duration(duration)
+        .style("opacity", 1);
+
+      // d3.select("#elPratName")
+      //   .transition()
+      //   .duration(duration)
+      //   .style("opacity", 1);
+
+      d3.selectAll(".IESContainer")
+        .selectAll(".rays")
+        .selectAll(".songs")
+        .transition()
+        .duration(duration)
+        .attr("transform", d => {
+          const r =
+            d.allStarR + paddingR + songR + (paddingR + songR * 2) * d.allIndex;
+          const cx = r * Math.cos(d.allAngle);
+          const cy = r * Math.sin(d.allAngle);
+          return `translate(${cx}, ${cy})`;
+        });
+    } else if (vizState === "All") {
+      vizState = "IES";
+
+      // Deseleccionar cualquier canción que estuviera seleccionada
+      d3.select(`#${selectedSong}`).style("stroke-opacity", 0);
+      selectedSong = undefined;
+      d3.select("#songInfoContainer").style("opacity", 0);
+
+      d3.selectAll(".IESContainer")
+        .transition()
+        .duration(duration)
+        .attr(
+          "transform",
+          d => `translate(${d.IESCoords.x}, ${d.IESCoords.y})`
+        );
+
+      d3.selectAll(".IESCircle")
+        .transition()
+        .duration(duration)
+        .attr("r", d => d.IESStarR);
+
+      d3.selectAll(".IESName")
+        .transition()
+        .duration(duration)
+        .style("opacity", 1);
+
+      d3.selectAll(".musicGenresLabels")
+        .transition()
+        .duration(halfDuration)
+        .style("opacity", 0);
+      // TODO queda un poco raro que aparezcan antes de que los puntos estén en su sitio
+
+      d3.selectAll(".IESContainer")
+        .selectAll(".rays")
+        .selectAll(".songs")
+        .transition()
+        .duration(duration)
+        .attr("transform", d => {
+          const r =
+            d.IESStarR + paddingR + songR + (paddingR + songR * 2) * d.IESIndex;
+          const cx = r * Math.cos(d.IESAngle);
+          const cy = r * Math.sin(d.IESAngle);
+          return `translate(${cx}, ${cy})`;
+        });
+    }
+  }
+
+  function showSongInfo(songs) {
+    songs.on("click", clicked);
+    songs
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseout", mouseout);
+
+    function clicked(event, song) {
+      event.stopPropagation();
+      if (vizState === "All") {
+        if (`song_${song.IES_ID}_${song.loop_ID}` !== selectedSong) {
+          // Si la canción que se ha seleccionado no estaba seleccionada
+
+          // Deseleccionar la canción anterior
+          d3.select(`#${selectedSong}`).style("stroke-opacity", 0);
+
+          // Mostrar el círculo alrededor del punto de la canción que indica que está seleccionada
+          d3.select(`#song_${song.IES_ID}_${song.loop_ID}`).style(
+            "stroke-opacity",
+            1
+          );
+          updateSongInfo(song);
+
+          // actualizar selectedSong con el id de esta canción
+          selectedSong = `song_${song.IES_ID}_${song.loop_ID}`;
+        } else {
+          // Si estaba seleccionada, deseleccionar
+          selectedSong = undefined;
+          d3.select(`#song_${song.IES_ID}_${song.loop_ID}`).style(
+            "stroke-opacity",
+            0
+          );
+        }
+      }
+    }
+    function mouseover(event, song) {
+      if (!selectedSong && vizState === "All") {
+        d3.select("#songInfoContainer").style("opacity", 1);
+      }
+      const cursor = vizState === "All" ? "pointer" : "default";
+      d3.select(this).style("cursor", cursor);
+    }
+    function mousemove(event, song) {
+      if (!selectedSong && vizState === "All") {
+        d3.select("#songInfoContainer").style("opacity", 1);
+
+        updateSongInfo(song);
+      }
+
+      const cursor = vizState === "All" ? "pointer" : "default";
+      d3.select(this).style("cursor", cursor);
+    }
+    function mouseout(event, song) {
+      if (!selectedSong) d3.select("#songInfoContainer").style("opacity", 0);
+    }
+    function updateSongInfo(song) {
+      d3.select("#songCover").attr("href", song.song_cover_url);
+      d3.select("#videoCover").attr("href", song.video_cover_url);
+      d3.select("#IESName").text(song.IES);
+      d3.select("#studentName").text(song.loop_name.replace(/ .*/, ""));
+      d3.select("#songName").text(
+        song.base_song_title.replace(`, ${song.artist}`, "")
+      );
+      d3.select("#artistName").text(song.artist);
+      d3.select("#musicGenre")
+        .text(song.music_genre)
+        .style("fill", musicGenreColorScale(song.music_genre));
+    }
   }
 }
 
@@ -478,6 +635,19 @@ function init(files) {
 function getDistinctElements(data, accesor = d => d) {
   return [...new Set(data.map(accesor))];
 }
+
+function getVideoURL(url) {
+  const regex = /v=([A-Za-z0-9_-]{11})/;
+  const match = url.match(regex);
+
+  if (match && match[1]) {
+    const videoId = match[1];
+    return `https://www.youtube.com/embed/${videoId}`;
+  } else {
+    console.log("No video ID found.");
+  }
+}
+
 function chunk(array, threshold) {
   const tempContainer = [];
 
@@ -520,7 +690,7 @@ function formatSongsData(data, musicGenres) {
   console.log("allSongsStar", allSongsStar);
 
   // Get Star inner radius when the songs are all together
-  const allSongsStarR =
+  allSongsStarR =
     getStarInnerRadius(allSongsStar) > minStarR
       ? getStarInnerRadius(allSongsStar)
       : minStarR;
@@ -581,10 +751,13 @@ function formatGenresData(data, musicGenres) {
             return acc;
           }
         }, 0) * angleUnit;
+    const rayHeight = d3.max(o.map(d => d.length));
 
     const musicGenresItem = {};
     musicGenresItem.musicGenreName = o.flat()[0]["music_genre"];
     musicGenresItem.angle = angle;
+    musicGenresItem.rayHeight = rayHeight;
+
     return musicGenresItem;
   });
 
