@@ -1,10 +1,10 @@
 // TODO list
-// - Meter imagen alumnxs
 // - Meter aspa para cerrar song info
-// - Al hacer click sobre el video cover se abre el video en otra página. Poner triángulo
 // - Colocar los circulos de los IES según force simulation
-// - Actualizar los textos
+// - Actualizar el texto de la página
 // - Meter logos
+// - Hay textos en la song info que se salen. Cortar? wrap?
+// - comprobar contraste colores
 
 function loadData() {
   const files = [d3.csv(`data/el_prat_song_data.csv`)];
@@ -24,7 +24,7 @@ loadData();
 // Constants ////////////////////////////////////////////////////////////////
 const windowWidth = document.getElementById("graph").clientWidth;
 const svgWidth = 1500 > windowWidth ? windowWidth : 1500;
-const svgHeight = svgWidth / 1.8;
+const svgHeight = svgWidth / 1.6;
 const songR = 4;
 const minStarR = windowWidth * 0.02;
 const paddingR = 6;
@@ -54,12 +54,7 @@ function init(files) {
   // console.log("dataRaw", dataRaw);
 
   // const musicGenres = getDistinctElements(dataRaw, d => d.music_genre);
-  // console.log("musicGenres", JSON.stringify(musicGenres));
-
   const musicGenres = [
-    "",
-    "New Age",
-    "Alternativa",
     "Rock",
     "Hard rock",
     "Punk",
@@ -73,7 +68,6 @@ function init(files) {
     "Afro-beat",
     "Beatbox",
     "Hip-Hop",
-    "Hip-hop del Reino Unido",
     "Hip-hop/Rap",
     "Rap",
     "Latin rap",
@@ -88,65 +82,28 @@ function init(files) {
     "R&B/Soul",
     "Downtempo",
     "Cantautores",
-    "Música para niños",
+    "Música infantil",
     "Músicas del mundo",
     "Gospel y música cristiana",
     "Musicales",
     "Banda sonora",
     "Futbol",
     "Publicidad",
+    "New Age",
+    "Alternativa",
+    "",
   ];
-  //   "Afro-beat",
-  //   "New Age",
-  //   "Dance",
-  //   "House",
-  //   "Electrónica",
-  //   "beatbox",
-  //   "Rock",
-  //   "Hard rock",
-  //   "Punk",
-  //   "Alternativa",
-  //   "Alternative",
-  //   "Pop",
-  //   "Pop en español",
-  //   "K-Pop",
-  //   "J-Pop",
-  //   "Salsa y Tropical",
-  //   "Urbano latino",
-  //   "Latino",
-  //   "Música latina",
-  //   "Hip-Hop",
-  //   "Hip-hop/Rap",
-  //   "Hip-Hop/Rap",
-  //   "Hip-hop del Reino Unido",
-  //   "Rap",
-  //   "Latin rap",
-  //   "Reggaeton, flamenco",
-  //   "flamenco",
-  //   "Flamenco",
-  //   "Futbol",
-  //   "Downtempo",
-  //   "musica infantil",
-  //   "Músicas del mundo",
-  //   "R&B/Soul",
-  //   "Reggae",
-  //   "Dubstep",
-  //   "Música para niños",
-  //   "Cantautores",
-  //   "Gospel y música cristiana",
-  //   "futbol",
-  //   "Musicales",
-  //   "Banda sonora",
-  //   "publicidad",
-  // ];
-
-  const data = formatSongsData(dataRaw, musicGenres);
-  console.log("data", data);
+  // console.log("musicGenres", JSON.stringify(musicGenres));
   // console.log("musicGenres", musicGenres.length);
 
+  const data = formatSongsData(dataRaw, musicGenres);
+  const dataByUniqueID = getDataByUniqueID(data);
   const genresData = formatGenresData(data, musicGenres);
-
   const dataByIESID = getDataByIESID(data, musicGenres);
+
+  console.log("data", data);
+  console.log("dataByUniqueID", dataByUniqueID);
+  console.log("dataByUniqueID", Object.values(dataByUniqueID));
   // console.log("dataByIESID", dataByIESID);
 
   // Scales ////////////////////////////////////////////////////////////////
@@ -292,10 +249,17 @@ function init(files) {
       .append("g")
       .attr("class", "musicGenresLabels")
       .attr("transform", d => {
+        // Poner todos los nombres a la misma distancia?
+        // TODO Calcular el rayHeight máximo. Ahora está puesto a mano
+        const maxRayHeight = 7;
         const r =
           allSongsStarR +
-          songR * 2 * d.rayHeight +
-          paddingR * (d.rayHeight + 1);
+          songR * 2 * maxRayHeight +
+          paddingR * (maxRayHeight + 2);
+        // const r =
+        //   allSongsStarR +
+        //   songR * 2 * d.rayHeight +
+        //   paddingR * (d.rayHeight + 2);
         const x = r * Math.cos(d.angle);
         const y = r * Math.sin(d.angle);
         return `translate(${x}, ${y})`;
@@ -316,6 +280,7 @@ function init(files) {
         else return "end";
       })
       .style("font", `${svgWidth * 0.01}px Arial`)
+      // .style("fill", "#8F8F8F")
       .style("fill", d => musicGenreColorScale(d.musicGenreName))
       .style("opacity", 1)
       .text(d => d.musicGenreName);
@@ -379,23 +344,51 @@ function init(files) {
       .style("font", "16px Arial")
       .style("fill", "#c2c2c2");
 
-    // Song cover
+    // Student cover
     songInfoContainer
       .append("svg:image")
-      .attr("id", "songCover")
+      .attr("id", "studentCover")
       .attr("x", -videoWidth * 0.2 - videoHeight - videoWidth * 0.04)
       .attr("y", -videoHeight / 2)
       .attr("width", videoHeight)
       .attr("height", videoHeight);
 
     // Video cover
-    songInfoContainer
+    const videoContainer = songInfoContainer
+      .append("g")
+      .attr("id", "videoCoverContainer")
+      .attr(
+        "transform",
+        `translate(${-videoWidth * 0.2}, ${-videoHeight / 2})`
+      );
+
+    videoContainer
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", videoWidth)
+      .attr("height", videoHeight)
+      .call(g => highlightVideo(g));
+
+    videoContainer
       .append("svg:image")
       .attr("id", "videoCover")
-      .attr("x", -videoWidth * 0.2)
-      .attr("y", -videoHeight / 2)
+      .attr("x", 0)
+      .attr("y", 0)
       .attr("width", videoWidth)
-      .attr("height", videoHeight);
+      .attr("height", videoHeight)
+      .style("pointer-events", "none");
+
+    videoContainer
+      .append("g")
+      .attr("transform", `translate(${videoWidth / 2}, ${videoHeight / 2})`)
+      .append("path")
+      .attr("id", "playIcon")
+      .attr("transform", "rotate(90)")
+      .attr("d", triangle(videoWidth / 6))
+      .style("fill", "none")
+      .style("stroke", "white")
+      .style("stroke-width", 2);
 
     // Song name
     songInfoContainer
@@ -450,12 +443,12 @@ function init(files) {
         const cy = r * Math.sin(d.allAngle);
         return `translate(${cx}, ${cy})`;
       })
-      .call(song => showSongInfo(song));
+      .call(songCircles => showSongInfo(songCircles));
 
     songCircles
       .append("circle")
       .attr("class", "songSelected")
-      .attr("id", d => `song_${d.IES_ID}_${d.loop_ID}`)
+      .attr("id", d => d.uniqueID)
       .attr("r", songR + 5)
       .style("pointer-events", "all")
       .style("fill", "none")
@@ -568,28 +561,22 @@ function init(files) {
     function clicked(event, song) {
       event.stopPropagation();
       if (vizState === "All") {
-        if (`song_${song.IES_ID}_${song.loop_ID}` !== selectedSong) {
+        if (song.uniqueID !== selectedSong) {
           // Si la canción que se ha seleccionado no estaba seleccionada
 
           // Deseleccionar la canción anterior
           d3.select(`#${selectedSong}`).style("stroke-opacity", 0);
 
           // Mostrar el círculo alrededor del punto de la canción que indica que está seleccionada
-          d3.select(`#song_${song.IES_ID}_${song.loop_ID}`).style(
-            "stroke-opacity",
-            1
-          );
+          d3.select(`#${song.uniqueID}`).style("stroke-opacity", 1);
           updateSongInfo(song);
 
           // actualizar selectedSong con el id de esta canción
-          selectedSong = `song_${song.IES_ID}_${song.loop_ID}`;
+          selectedSong = song.uniqueID;
         } else {
           // Si estaba seleccionada, deseleccionar
           selectedSong = undefined;
-          d3.select(`#song_${song.IES_ID}_${song.loop_ID}`).style(
-            "stroke-opacity",
-            0
-          );
+          d3.select(`#${song.uniqueID}`).style("stroke-opacity", 0);
         }
       }
     }
@@ -614,8 +601,14 @@ function init(files) {
       if (!selectedSong) d3.select("#songInfoContainer").style("opacity", 0);
     }
     function updateSongInfo(song) {
-      d3.select("#songCover").attr("href", song.song_cover_url);
+      d3.select("#studentCover").attr(
+        "xlink:href",
+        `data/student-covers/${song.loop_name}.jpg`
+      );
       d3.select("#videoCover").attr("href", song.video_cover_url);
+      d3.select("#videoCoverContainer")
+        .select("rect")
+        .attr("id", song.uniqueID);
       d3.select("#IESName").text(song.IES);
       d3.select("#studentName").text(song.loop_name.replace(/ .*/, ""));
       d3.select("#songName").text(
@@ -627,6 +620,32 @@ function init(files) {
         .style("fill", musicGenreColorScale(song.music_genre));
     }
   }
+
+  function highlightVideo(g) {
+    g.on("click.video", clicked);
+
+    g.on("mouseover.video", mouseover)
+      .on("mousemove.video", mousemove)
+      .on("mouseout.video", mouseout);
+
+    function clicked(event) {
+      event.stopPropagation();
+      const songUniqueID = d3.select(event.target).attr("id");
+      const videoUrl = dataByUniqueID[songUniqueID].youtube_url;
+      window.open(videoUrl, "_blank");
+    }
+    function mouseover(event) {
+      d3.select(event.target).style("cursor", "pointer");
+      d3.select("#playIcon").style("fill", "white");
+    }
+    function mousemove(event) {
+      d3.select(event.target).style("cursor", "pointer");
+      d3.select("#playIcon").style("fill", "white");
+    }
+    function mouseout(event) {
+      d3.select("#playIcon").style("fill", "none");
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -636,17 +655,22 @@ function getDistinctElements(data, accesor = d => d) {
   return [...new Set(data.map(accesor))];
 }
 
-function getVideoURL(url) {
-  const regex = /v=([A-Za-z0-9_-]{11})/;
-  const match = url.match(regex);
-
-  if (match && match[1]) {
-    const videoId = match[1];
-    return `https://www.youtube.com/embed/${videoId}`;
-  } else {
-    console.log("No video ID found.");
-  }
+function triangle(l) {
+  const h = (l * Math.sqrt(3)) / 2;
+  return `M${0} ${-(h * 2) / 3} L${l / 2} ${h / 3} L${-l / 2} ${h / 3} Z`;
 }
+
+// function getVideoURL(url) {
+//   const regex = /v=([A-Za-z0-9_-]{11})/;
+//   const match = url.match(regex);
+
+//   if (match && match[1]) {
+//     const videoId = match[1];
+//     return `https://www.youtube.com/embed/${videoId}`;
+//   } else {
+//     console.log("No video ID found.");
+//   }
+// }
 
 function chunk(array, threshold) {
   const tempContainer = [];
@@ -672,6 +696,16 @@ function getStarInnerRadius(data) {
     paddingR -
     songR
   );
+}
+
+function getDataByUniqueID(data) {
+  const dataByUniqueID = {};
+  data.forEach(song => {
+    song["uniqueID"] = `song_${song.project_ID}_${song.loop_ID}`;
+    if (!dataByUniqueID[`song_${song.project_ID}_${song.loop_ID}`])
+      dataByUniqueID[`song_${song.project_ID}_${song.loop_ID}`] = song;
+  });
+  return dataByUniqueID;
 }
 
 function formatSongsData(data, musicGenres) {
