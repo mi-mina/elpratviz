@@ -1,4 +1,6 @@
 // TODO list
+// - Se puede cambiar la url? https://mi-mina.github.io/elpratviz/
+// - poner la imagen del video más oscura
 // - Ajustar medidas width and height
 // - Meter aspa para cerrar song info
 // - Cambiar el click de cambio de visualización a un icono
@@ -373,6 +375,7 @@ function init(files) {
       .attr("y", 0)
       .attr("width", videoWidth)
       .attr("height", videoHeight)
+      .style("opacity", 0.4)
       .style("pointer-events", "none");
 
     // Play icon
