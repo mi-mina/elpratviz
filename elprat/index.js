@@ -1,12 +1,12 @@
 // TODO list
 // - Se puede cambiar la url? https://mi-mina.github.io/elpratviz/
-// - poner la imagen del video más oscura
+// - Cambiar de viz cuando se hace click dentro de los circulos
+// - Meter title en los puntos "Haz click para fijar la info"
 // - Ajustar medidas width and height
 // - Meter aspa para cerrar song info
-// - Cambiar el click de cambio de visualización a un icono
 // - En viz por IES meter enlace al proyecto en play.antropoloops
 // - comprobar contraste colores
-// - Poner un texto en medio del círculo grande cuando no hay ninguna canción seleccionada?
+// - Poner "El Prat" en el circulo grande
 
 // - Actualizar el texto de la página. Rubi me tiene que dar los textos
 // - Meter logos. Rubi me tiene que dar los logos
