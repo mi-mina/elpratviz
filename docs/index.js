@@ -206,6 +206,7 @@ function init(files) {
     .append("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight)
+    .attr("class", "mh-auto")
     .style("user-select", "none");
 
   const chartContainer = svg
