@@ -7,8 +7,6 @@
 // - Poner "El Prat" en el circulo grande
 // - Cuando no existe un vídeo se muestra el anterior, debería no mostrarse nada
 
-// - Meter logos. Rubi me tiene que dar los logos
-
 function loadData() {
   const files = [d3.csv(`data/el_prat_song_data.csv`)];
 
@@ -29,7 +27,7 @@ const windowWidth = document.getElementById("graph").clientWidth;
 const svgWidth = 800 > windowWidth ? windowWidth : 800;
 const svgHeight = svgWidth;
 const songR = svgHeight * 0.006;
-const minStarR = windowWidth * 0.02;
+const minStarR = svgHeight * 0.04;
 const paddingR = svgHeight * 0.008;
 const paddingH = svgHeight * 0.01;
 let allSongsStarR;
@@ -198,7 +196,66 @@ function init(files) {
 
   drawStars(dataByIESID, genresData);
 
-  svg.on("click", () => toogleViz());
+  toogleVizButton();
+
+  function toogleVizButton() {
+    const iconSide = 60;
+    const svg = d3
+      .select("#toogleViz")
+      .append("svg")
+      .attr("width", iconSide)
+      .attr("height", iconSide)
+      .style("cursor", "pointer")
+      .on("click", () => {
+        if (vizState === "IES") {
+          d3.select("#smallCircles").style("opacity", 1);
+          d3.select("#bigCircle").style("opacity", 0);
+        } else if (vizState === "All") {
+          d3.select("#smallCircles").style("opacity", 0);
+          d3.select("#bigCircle").style("opacity", 1);
+        }
+        toogleViz();
+      });
+
+    const iconContainer = svg
+      .append("g")
+      .attr("transform", `translate(${iconSide / 2}, ${iconSide / 2})`);
+
+    iconContainer
+      .append("circle")
+      .attr("r", iconSide / 2)
+      .style("fill", "#0f0f0f");
+    // .style("stroke", "pink");
+    // 474747
+
+    const smallCircles = iconContainer.append("g").attr("id", "smallCircles");
+
+    smallCircles
+      .selectAll(".smallCircles")
+      .data(dataByIESID)
+      .enter()
+      .append("circle")
+      .attr("cy", -iconSide * 0.3)
+      .attr("r", (d, i) => iconSide * i * 0.01 + iconSide * 0.1)
+      .attr("transform", (d, i) => `rotate(${(360 / dataByIESID.length) * i})`)
+      .style("fill", "none")
+      .style("stroke", "grey")
+      .style("stroke-width", "2px")
+      .style("pointer-events", "none");
+
+    const bigCircle = iconContainer
+      .append("g")
+      .attr("id", "bigCircle")
+      .style("opacity", 0);
+
+    bigCircle
+      .append("circle")
+      .attr("r", iconSide * 0.25)
+      .style("fill", "none")
+      .style("stroke", "grey")
+      .style("stroke-width", "2px")
+      .style("pointer-events", "none");
+  }
 
   function drawStars(dataByIESID, genresData) {
     const ies = chartContainer
@@ -710,18 +767,6 @@ function triangle(l) {
   const h = (l * Math.sqrt(3)) / 2;
   return `M${0} ${-(h * 2) / 3} L${l / 2} ${h / 3} L${-l / 2} ${h / 3} Z`;
 }
-
-// function getVideoURL(url) {
-//   const regex = /v=([A-Za-z0-9_-]{11})/;
-//   const match = url.match(regex);
-
-//   if (match && match[1]) {
-//     const videoId = match[1];
-//     return `https://www.youtube.com/embed/${videoId}`;
-//   } else {
-//     console.log("No video ID found.");
-//   }
-// }
 
 function chunk(array, threshold) {
   const tempContainer = [];

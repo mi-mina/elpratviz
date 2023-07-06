@@ -16,8 +16,8 @@
         }
 
         .container {
-            max-width: 700px;
-            margin: 2rem auto;
+            max-width: 800px;
+            margin: 4rem auto;
             padding: 20px;
         }
 
@@ -30,7 +30,7 @@
         .imageContainer img {
             flex: 1;
             width: 0;
-            padding-right: 2rem;
+            padding-right: 3rem;
             object-fit: contain;
         }
 
@@ -40,6 +40,7 @@
 
         .type-h1 {
             font-family: Arial, Helvetica, sans-serif;
+            margin-top: 4rem;
             max-width: 80ch;
         }
 
@@ -80,17 +81,14 @@
 </head>
 
 <body>
-    <div id="graph" style="margin-top: 4rem; margin-bottom: 4rem; display: flex;
-    justify-content: center;
-    align-items: center;"></div>
-
-    <!-- <iframe allowfullscreen width="200" height="112" src="https://www.youtube.com/embed/tgbNymZ7vqY" frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
-    </iframe> -->
     <div class="container">
-        <h1 class="type-h1 type-color-grey-10 mh-auto">Laboratorio sonoro Antropoloops
+        <div style="position: relative;">
+            <div id="graph"></div>
+            <div id="toogleViz" style="position: absolute; left:0; top:0;"></div>
+        </div>
+        <h1 class="type-h1 type-color-grey-10">Laboratorio sonoro Antropoloops
         </h1>
-        <h2 class="type-h2 type-color-grey-10 mh-auto">Teatre L'artesá + La Capsa]
+        <h2 class="type-h2 type-color-grey-10">Teatre L'artesá + La Capsa]
         </h2>
         <p class="type-paragraph type-color-grey-10">
             Complejo, pero muy muy atractivo, esa fue nuestra primera impresión ante el reto que nos propuso el equipo
