@@ -5,7 +5,9 @@
 // - En viz por IES meter enlace al proyecto en play.antropoloops
 // - comprobar contraste colores
 // - Poner "El Prat" en el circulo grande
-// - Cuando no existe un vídeo se muestra el anterior, debería no mostrarse nada
+// - Cuando no existe un vídeo o una imagen se muestra el anterior, debería no mostrarse nada.
+//   Creo que pasa solo en firefox
+// - Pasa algo raro con las imágenes, algunas no las muestra en la web, pero en local sí
 
 function loadData() {
   const files = [d3.csv(`data/el_prat_song_data.csv`)];
