@@ -1,14 +1,12 @@
 // TODO list
 // - Se puede cambiar la url? https://mi-mina.github.io/elpratviz/
 // - Cambiar de viz cuando se hace click dentro de los circulos
-// - Meter title en los puntos "Haz click para fijar la info"
 // - Ajustar medidas width and height
-// - Meter aspa para cerrar song info
 // - En viz por IES meter enlace al proyecto en play.antropoloops
 // - comprobar contraste colores
 // - Poner "El Prat" en el circulo grande
+// - Cuando no existe un vídeo se muestra el anterior, debería no mostrarse nada
 
-// - Actualizar el texto de la página. Rubi me tiene que dar los textos
 // - Meter logos. Rubi me tiene que dar los logos
 
 function loadData() {
@@ -28,12 +26,12 @@ loadData();
 
 // Constants ////////////////////////////////////////////////////////////////
 const windowWidth = document.getElementById("graph").clientWidth;
-const svgWidth = 1500 > windowWidth ? windowWidth : 1500;
-const svgHeight = svgWidth / 1.6;
-const songR = 4;
+const svgWidth = 800 > windowWidth ? windowWidth : 800;
+const svgHeight = svgWidth;
+const songR = svgHeight * 0.006;
 const minStarR = windowWidth * 0.02;
-const paddingR = 6;
-const paddingH = 8;
+const paddingR = svgHeight * 0.008;
+const paddingH = svgHeight * 0.01;
 let allSongsStarR;
 const coord = {
   1: { x: svgWidth / 6 - svgWidth / 2, y: svgHeight / 4 - svgHeight / 2 },
@@ -58,11 +56,17 @@ function init(files) {
   const dataRaw = files[0];
   // console.log("dataRaw", dataRaw);
 
-  // const musicGenres = getDistinctElements(dataRaw, d => d.music_genre);
+  // const musicGenresOriginal = getDistinctElements(dataRaw, d => d.music_genre);
+  // console.log("musicGenresOriginal", JSON.stringify(musicGenresOriginal));
+  // console.log("musicGenresOriginal", musicGenresOriginal.length);
+
   const musicGenres = [
-    "Rock",
-    "Hard rock",
     "Punk",
+    "Hard rock",
+    "Rock",
+    "Garage Rock",
+    "Indie-rock",
+    "Indie-pop",
     "Pop",
     "Pop en español",
     "J-Pop",
@@ -73,14 +77,12 @@ function init(files) {
     "Afro-beat",
     "Beatbox",
     "Hip-Hop",
-    "Hip-hop/Rap",
-    "Rap",
-    "Latin rap",
+    "Hip-Hop / Drill",
+    "Latin Hip-Hop",
     "Latino",
     "Urbano latino",
     "Música latina",
     "Salsa y Tropical",
-    "Reggaeton, flamenco",
     "Flamenco",
     "Reggae",
     "Dubstep",
@@ -96,7 +98,6 @@ function init(files) {
     "Publicidad",
     "New Age",
     "Alternativa",
-    "",
   ];
   // console.log("musicGenres", JSON.stringify(musicGenres));
   // console.log("musicGenres", musicGenres.length);
@@ -114,47 +115,8 @@ function init(files) {
   const videoHeight = videoWidth / 1.77;
 
   // Scales ////////////////////////////////////////////////////////////////
-  const colors1 = [
-    "#5cecb5",
-    "#008c6c",
-    "#02a3f9",
-    "#00539c",
-    "#027feb",
-    "#a9b4ff",
-    "#9985ff",
-    "#d097ff",
-    "#954abd",
-    "#dea9ec",
-    "#f2a9ff",
-    "#e16edd",
-    "#86007a",
-    "#ffa5e2",
-    "#ff6ecf",
-    "#9e216f",
-    "#952b36",
-    "#eb4557",
-    "#ff8a7c",
-    "#914135",
-    "#f9634e",
-    "#b74108",
-    "#ff9c5e",
-    "#824700",
-    "#ffb246",
-    "#fbce6e",
-    "#e3b82f",
-    "#7d7700",
-    "#92b72a",
-    "#7e9048",
-    "#558f00",
-    "#a2e676",
-    "#aee296",
-    "#006604",
-    "#69eb84",
-    "#01bc69",
-    "#01b37d",
-    "#008a61",
-  ];
   const colors = [
+    "#d1f586",
     "#aafd21",
     "#71a92f",
     "#b5fb82",
@@ -169,7 +131,6 @@ function init(files) {
     "#7bbaa0",
     "#b3f6dc",
     "#7cffd8",
-    "#97fae4",
     "#01b09c",
     "#01e9d7",
     "#02aad3",
@@ -192,7 +153,6 @@ function init(files) {
     "#ffe754",
     "#acba00",
     "#e5f15d",
-    "#d1f586",
   ];
   // console.log("colors", colors.length);
   const musicGenreColorScale = d3
@@ -281,7 +241,7 @@ function init(files) {
           return "start";
         else return "end";
       })
-      .style("font", `${svgWidth * 0.01}px Arial`)
+      .style("font", `${svgHeight * 0.017}px Arial`)
       .style("fill", d => musicGenreColorScale(d.musicGenreName))
       .style("opacity", 1)
       .text(d => d.musicGenreName);
@@ -292,7 +252,7 @@ function init(files) {
       .attr("class", "IESCircle")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", d => d.allStarR - svgWidth * 0.01)
+      .attr("r", d => d.allStarR - svgHeight * 0.01)
       .style("fill", "none")
       .style("stroke", "grey")
       .style("stroke-width", "2px")
@@ -306,7 +266,7 @@ function init(files) {
       .attr("y", 0)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
-      .style("font", `${svgWidth * 0.01}px Arial`)
+      .style("font", `${svgHeight * 0.015}px Arial`)
       .style("fill", "#fff")
       .style("opacity", 0)
       .text(d => d.name)
@@ -328,8 +288,63 @@ function init(files) {
       .attr("id", "backgroundCircle")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", allSongsStarR - svgWidth * 0.01)
+      .attr("r", allSongsStarR - svgHeight * 0.015)
       .style("fill", "#171717");
+
+    // CLose Info Button
+    const closeInfoButtonRadius = svgHeight * 0.015;
+
+    const closeInfoButton = songInfoContainer
+      .append("g")
+      .attr("id", "closeInfoButton")
+      .attr("transform", `translate(0, ${-allSongsStarR * 0.75})`)
+      .style("opacity", 0)
+      .on("click", function () {
+        // Deseleccionar el círculo de la canción que estaba seleccionada
+        d3.select(`#${selectedSong}`).style("stroke-opacity", 0);
+
+        // Ocultar info canción
+        d3.select("#songInfoContainer").style("opacity", 0);
+
+        // Ocultar close button
+        d3.select("#closeInfoButton").style("opacity", 0);
+        d3.select("#closeInfoCircle").style("cursor", "default");
+
+        selectedSong = undefined;
+      });
+
+    closeInfoButton
+      .append("circle")
+      .attr("id", "closeInfoCircle")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", closeInfoButtonRadius)
+      .style("fill", "#171717")
+      .style("stroke", "grey")
+      .style("stroke-width", "2px")
+      .style("opacity", 0);
+
+    closeInfoButton
+      .append("line")
+      .attr("transform", `rotate(45)`)
+      .attr("x1", -closeInfoButtonRadius * 0.6)
+      .attr("y1", 0)
+      .attr("x2", closeInfoButtonRadius * 0.6)
+      .attr("y2", 0)
+      .style("stroke", "grey")
+      .style("stroke-width", "2px")
+      .style("pointer-events", "none");
+
+    closeInfoButton
+      .append("line")
+      .attr("transform", `rotate(45)`)
+      .attr("x1", 0)
+      .attr("y1", -closeInfoButtonRadius * 0.6)
+      .attr("x2", 0)
+      .attr("y2", closeInfoButtonRadius * 0.6)
+      .style("stroke", "grey")
+      .style("stroke-width", "2px")
+      .style("pointer-events", "none");
 
     // IES name
     songInfoContainer
@@ -339,7 +354,7 @@ function init(files) {
       .attr("y", -videoHeight / 2 - videoWidth * 0.17)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
-      .style("font", "16px Arial")
+      .style("font", `${svgHeight * 0.024}px Arial`)
       .style("fill", "#c2c2c2");
 
     // Student cover
@@ -356,7 +371,7 @@ function init(files) {
       .append("g")
       .attr("id", "videoCoverContainer")
       .attr("transform", `translate(${-videoWidth * 0.2}, ${-videoHeight / 2})`)
-      .attr("pointer-events", "visible");
+      .style("pointer-events", "visible");
 
     // Rect to catch video pointer events
     videoContainer
@@ -365,7 +380,7 @@ function init(files) {
       .attr("y", 0)
       .attr("width", videoWidth)
       .attr("height", videoHeight)
-      .attr("pointer-events", "visible")
+      .style("pointer-events", "visible")
       .call(g => highlightVideo(g));
 
     // Video cover image
@@ -397,10 +412,10 @@ function init(files) {
       .append("text")
       .attr("id", "songName")
       .attr("x", -videoWidth * 0.2)
-      .attr("y", videoHeight / 2 + videoWidth * 0.05)
+      .attr("y", videoHeight / 2 + videoWidth * 0.07)
       .attr("dy", "0.35em")
       .attr("text-anchor", "start")
-      .style("font", "12px Arial")
+      .style("font", `${svgHeight * 0.022}px Arial`)
       .style("fill", "#c2c2c2");
 
     // Artist name
@@ -408,10 +423,10 @@ function init(files) {
       .append("text")
       .attr("id", "artistName")
       .attr("x", -videoWidth * 0.2)
-      .attr("y", videoHeight / 2 + videoWidth * 0.15)
+      .attr("y", videoHeight / 2 + videoWidth * 0.18)
       .attr("dy", "0.35em")
       .attr("text-anchor", "start")
-      .style("font", "14px Arial")
+      .style("font", `${svgHeight * 0.018}px Arial`)
       .style("fill", "#c2c2c2");
 
     // Music genre
@@ -422,7 +437,7 @@ function init(files) {
       .attr("y", videoHeight / 2 + videoWidth * 0.3)
       .attr("dy", "0.35em")
       .attr("text-anchor", "start")
-      .style("font", "18px Arial")
+      .style("font", `${svgHeight * 0.025}px Arial`)
       .style("fill", "#fff");
 
     const rays = ies
@@ -463,6 +478,8 @@ function init(files) {
       .attr("id", d => `${d.music_genre}-IES${d.IES_ID}-${d.loop_name}`)
       .attr("r", songR)
       .style("fill", d => musicGenreColorScale(d.music_genre));
+
+    songCircles.append("svg:title").text("Haz click para fijar la info");
   }
 
   function toogleViz() {
@@ -477,7 +494,7 @@ function init(files) {
       d3.selectAll(".IESCircle")
         .transition()
         .duration(duration)
-        .attr("r", d => d.allStarR - svgWidth * 0.01);
+        .attr("r", d => d.allStarR - svgHeight * 0.01);
 
       d3.selectAll(".IESName")
         .transition()
@@ -567,10 +584,20 @@ function init(files) {
 
           // actualizar selectedSong con el id de esta canción
           selectedSong = song.uniqueID;
+
+          d3.select("#closeInfoButton").style("opacity", 1);
         } else {
           // Si estaba seleccionada, deseleccionar
           selectedSong = undefined;
+
+          // Ocultar circulo alrededor canción
           d3.select(`#${song.uniqueID}`).style("stroke-opacity", 0);
+
+          // Ocultar info canción
+          d3.select("#songInfoContainer").style("opacity", 0);
+
+          // Ocultar close button
+          d3.select("#closeInfoButton").style("opacity", 0);
         }
       }
     }

@@ -5,16 +5,33 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Laboratorio sonoro Antropoloops</title>
     <style>
         body {
             background-color: #0f0f0f;
         }
 
+        a {
+            color: #f7f7b5;
+        }
+
         .container {
             max-width: 700px;
-            margin: 0 auto;
+            margin: 2rem auto;
             padding: 20px;
+        }
+
+        .imageContainer {
+            display: flex;
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .imageContainer img {
+            flex: 1;
+            width: 0;
+            padding-right: 2rem;
+            object-fit: contain;
         }
 
         .type-color-grey-10 {
@@ -38,14 +55,34 @@
             max-width: 80ch;
         }
 
+        .type-paragraph--small {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.85rem;
+            line-height: 1.5rem;
+            max-width: 80ch;
+        }
+
         .mh-auto {
             margin: 0 auto;
+        }
+
+        #closeInfoCircle:hover {
+            opacity: 1 !important;
+            cursor: pointer;
+            fill: grey !important;
+            stroke: none !important;
+        }
+
+        #closeInfoCircle:hover~line {
+            stroke: #171717 !important;
         }
     </style>
 </head>
 
 <body>
-    <div id="graph" display="flex" style="margin-top: 4rem; margin-bottom: 4rem;"></div>
+    <div id="graph" style="margin-top: 4rem; margin-bottom: 4rem; display: flex;
+    justify-content: center;
+    align-items: center;"></div>
 
     <!-- <iframe allowfullscreen width="200" height="112" src="https://www.youtube.com/embed/tgbNymZ7vqY" frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
@@ -56,35 +93,44 @@
         <h2 class="type-h2 type-color-grey-10 mh-auto">Teatre L'artesá + La Capsa]
         </h2>
         <p class="type-paragraph type-color-grey-10">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fermentum mattis sagittis. Vestibulum tristique
-            dui
-            ut dui accumsan, vel mollis lectus congue. Sed ac mi at magna consectetur scelerisque. Nullam fringilla eu
-            magna
-            et ullamcorper. Duis elementum, elit nec gravida facilisis, lectus lectus iaculis sapien, at fermentum elit
-            leo
-            at orci. Integer interdum velit sed tincidunt sagittis. Maecenas ut diam eget justo finibus faucibus.
-            Suspendisse iaculis turpis eu feugiat tincidunt. Pellentesque eu nunc arcu. Aliquam vitae aliquet mauris.
+            Complejo, pero muy muy atractivo, esa fue nuestra primera impresión ante el reto que nos propuso el equipo
+            del <a href="https://www.teatrelartesa.cat/" target="_blank">Teatre L'Artesà</a>: pensar en un proyecto para
+            trabajar con 5
+            Institutos de secundaria, ¡casi todo el alumnado de 1º de la ESO del Prat del Llobregat!
+
+            Le planteamos al alumnado que pensaran en una canción importante para ell@s, asociada al paso del cole al
+            instituto, para poder luego hacer en <a href="https://lacapsa.org/" target="_blank">La Capsa</a> una pieza
+            de remezcla
+            colectiva con los loops que crearon de sus canciones.
         </p>
         <p class="type-paragraph type-color-grey-10">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fermentum mattis sagittis. Vestibulum tristique
-            dui
-            ut dui accumsan, vel mollis lectus congue. Sed ac mi at magna consectetur scelerisque. Nullam fringilla eu
-            magna
-            et ullamcorper. Duis elementum, elit nec gravida facilisis, lectus lectus iaculis sapien, at fermentum elit
-            leo
-            at orci. Integer interdum velit sed tincidunt sagittis. Maecenas ut diam eget justo finibus faucibus.
-            Suspendisse iaculis turpis eu feugiat tincidunt. Pellentesque eu nunc arcu. Aliquam vitae aliquet mauris.
+            <a href="https://www.instagram.com/_mi_mi_na_/" target="_blank">Esperanza Moreno</a> ha creado esta
+            visualización que
+            permite explorar las canciones que eligieron y ver la distribución de géneros musicales, así como alternar
+            entre su reparto general y por Institutos. A pesar de la predominancia de las músicas urbanas y latinas, nos
+            ha sorprendido la diversidad existente frente a los prejuicios usuales que existen desde la mirada adulta,
+            casi no se han repetido canciones entre las casi 300 elegidas.
         </p>
         <p class="type-paragraph type-color-grey-10">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fermentum mattis sagittis. Vestibulum tristique
-            dui
-            ut dui accumsan, vel mollis lectus congue. Sed ac mi at magna consectetur scelerisque. Nullam fringilla eu
-            magna
-            et ullamcorper. Duis elementum, elit nec gravida facilisis, lectus lectus iaculis sapien, at fermentum elit
-            leo
-            at orci. Integer interdum velit sed tincidunt sagittis. Maecenas ut diam eget justo finibus faucibus.
-            Suspendisse iaculis turpis eu feugiat tincidunt. Pellentesque eu nunc arcu. Aliquam vitae aliquet mauris.
+            Aunque no creemos mucho en las etiquetas para la música, en este caso nos ha parecido interesante como
+            herramienta para caracterizar el paisaje musical de los intereses del alumnado. Los datos del género musical
+            se han extraído automáticamente usando la API de Shazam.
         </p>
+        <p class="type-paragraph--small type-color-grey-10" style="margin-top: 2rem;">
+            Puedes explorar los loops creados por el alumnado y componer tu propia pieza con el teclado de tu ordenador
+            en <a href="https://app.antropoloops.com/teatrelartesa" target="_blank">app.antropoloops</a>
+        </p>
+        <p class="type-paragraph--small type-color-grey-10">
+            Vídeo resumen del proyecto: <a href="https://www.youtube.com/watch?v=VjjDTWb56LA" target="_blank">Camins
+                Vius: Antropoloops</a>
+        </p>
+
+        <div class="imageContainer">
+            <img src="img/antropoloops_logo.png" alt="">
+            <img src="img/lartesa_logo.png" alt="">
+            <img src="img/lacapsa_logo.png" alt="">
+        </div>
+
     </div>
 
 
