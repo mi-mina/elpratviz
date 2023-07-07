@@ -1,11 +1,10 @@
 // TODO list
 // - Se puede cambiar la url? https://mi-mina.github.io/elpratviz/
-// - Cambiar de viz cuando se hace click dentro de los circulos
-// - Ajustar medidas width and height
 // - En viz por IES meter enlace al proyecto en play.antropoloops
 // - comprobar contraste colores
-// - Poner "El Prat" en el circulo grande
-// - Cuando no existe un vídeo se muestra el anterior, debería no mostrarse nada
+// - Cuando no existe un vídeo o una imagen se muestra el anterior, debería no mostrarse nada.
+//   Creo que pasa solo en firefox
+// - Pasa algo raro con las imágenes, algunas no las muestra en la web, pero en local sí
 
 function loadData() {
   const files = [d3.csv(`data/el_prat_song_data.csv`)];
@@ -222,11 +221,14 @@ function init(files) {
       .attr("transform", `translate(${iconSide / 2}, ${iconSide / 2})`);
 
     iconContainer
+      .append("title")
+      .text("Haz click para cambiar el tipo de visualización");
+
+    iconContainer
       .append("circle")
       .attr("r", iconSide / 2)
+      .attr("id", "toogleVizCircle")
       .style("fill", "#0f0f0f");
-    // .style("stroke", "pink");
-    // 474747
 
     const smallCircles = iconContainer.append("g").attr("id", "smallCircles");
 
@@ -258,6 +260,17 @@ function init(files) {
   }
 
   function drawStars(dataByIESID, genresData) {
+    // El Prat title
+    chartContainer
+      .append("text")
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
+      .attr("id", "elPratText")
+      .style("font", `${svgHeight * 0.017}px Arial`)
+      .style("fill", "#BDBDBD")
+      .text("El prat");
+
+    // IES Containers
     const ies = chartContainer
       .selectAll(".IESContainer")
       .data(dataByIESID)
@@ -266,7 +279,11 @@ function init(files) {
       .attr("class", "IESContainer");
 
     // Music genres items
-    const genresItems = chartContainer
+    const musicGenreContainer = chartContainer
+      .append("g")
+      .attr("id", "musicGeneres");
+
+    const genresItems = musicGenreContainer
       .selectAll(".musicGenresLabels")
       .data(genresData)
       .enter()
@@ -324,7 +341,7 @@ function init(files) {
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
       .style("font", `${svgHeight * 0.015}px Arial`)
-      .style("fill", "#fff")
+      .style("fill", "#BDBDBD")
       .style("opacity", 0)
       .text(d => d.name)
       .call(text => {
@@ -494,8 +511,7 @@ function init(files) {
       .attr("y", videoHeight / 2 + videoWidth * 0.3)
       .attr("dy", "0.35em")
       .attr("text-anchor", "start")
-      .style("font", `${svgHeight * 0.025}px Arial`)
-      .style("fill", "#fff");
+      .style("font", `${svgHeight * 0.025}px Arial`);
 
     const rays = ies
       .selectAll(".rays")
@@ -543,6 +559,11 @@ function init(files) {
     if (vizState === "IES") {
       vizState = "All";
 
+      d3.select("#elPratText")
+        .transition()
+        .duration(duration)
+        .style("opacity", 1);
+
       d3.selectAll(".IESContainer")
         .transition()
         .duration(duration)
@@ -577,6 +598,11 @@ function init(files) {
         });
     } else if (vizState === "All") {
       vizState = "IES";
+
+      d3.select("#elPratText")
+        .transition()
+        .duration(duration)
+        .style("opacity", 0);
 
       // Deseleccionar cualquier canción que estuviera seleccionada
       d3.select(`#${selectedSong}`).style("stroke-opacity", 0);
