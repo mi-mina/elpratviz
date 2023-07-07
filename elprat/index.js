@@ -264,7 +264,7 @@ function init(files) {
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
       .attr("id", "elPratText")
-      .style("font", `${svgHeight * 0.017}px Arial`)
+      .style("font", `${svgHeight * 0.017}px Roboto`)
       .style("fill", "#BDBDBD")
       .text("El prat");
 
@@ -313,7 +313,7 @@ function init(files) {
           return "start";
         else return "end";
       })
-      .style("font", `${svgHeight * 0.017}px Arial`)
+      .style("font", `${svgHeight * 0.017}px Roboto`)
       .style("fill", d => musicGenreColorScale(d.musicGenreName))
       .style("opacity", 1)
       .text(d => d.musicGenreName);
@@ -338,7 +338,7 @@ function init(files) {
       .attr("y", 0)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
-      .style("font", `${svgHeight * 0.015}px Arial`)
+      .style("font", `${svgHeight * 0.015}px Roboto`)
       .style("fill", "#BDBDBD")
       .style("opacity", 0)
       .text(d => d.name)
@@ -426,7 +426,7 @@ function init(files) {
       .attr("y", -videoHeight / 2 - videoWidth * 0.17)
       .attr("dy", "0.35em")
       .attr("text-anchor", "middle")
-      .style("font", `${svgHeight * 0.024}px Arial`)
+      .style("font", `${svgHeight * 0.024}px Roboto`)
       .style("fill", "#c2c2c2");
 
     // Student cover
@@ -487,7 +487,7 @@ function init(files) {
       .attr("y", videoHeight / 2 + videoWidth * 0.07)
       .attr("dy", "0.35em")
       .attr("text-anchor", "start")
-      .style("font", `${svgHeight * 0.022}px Arial`)
+      .style("font", `${svgHeight * 0.022}px Roboto`)
       .style("fill", "#c2c2c2");
 
     // Artist name
@@ -498,7 +498,7 @@ function init(files) {
       .attr("y", videoHeight / 2 + videoWidth * 0.18)
       .attr("dy", "0.35em")
       .attr("text-anchor", "start")
-      .style("font", `${svgHeight * 0.018}px Arial`)
+      .style("font", `${svgHeight * 0.018}px Roboto`)
       .style("fill", "#c2c2c2");
 
     // Music genre
@@ -509,7 +509,7 @@ function init(files) {
       .attr("y", videoHeight / 2 + videoWidth * 0.3)
       .attr("dy", "0.35em")
       .attr("text-anchor", "start")
-      .style("font", `${svgHeight * 0.025}px Arial`);
+      .style("font", `${svgHeight * 0.025}px Roboto`);
 
     const rays = ies
       .selectAll(".rays")
