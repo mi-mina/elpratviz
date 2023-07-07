@@ -1,10 +1,8 @@
+// https://mi-mina.github.io/elpratviz/
+
 // TODO list
-// - Se puede cambiar la url? https://mi-mina.github.io/elpratviz/
-// - En viz por IES meter enlace al proyecto en play.antropoloops
-// - comprobar contraste colores
-// - Cuando no existe un vídeo o una imagen se muestra el anterior, debería no mostrarse nada.
-//   Creo que pasa solo en firefox
-// - Pasa algo raro con las imágenes, algunas no las muestra en la web, pero en local sí
+// - En viz por IES meter enlace al proyecto en play.antropoloops?
+// - Comprobar contraste colores
 
 function loadData() {
   const files = [d3.csv(`data/el_prat_song_data.csv`)];
@@ -104,7 +102,7 @@ function init(files) {
   const genresData = formatGenresData(data, musicGenres);
   const dataByIESID = getDataByIESID(data, musicGenres);
 
-  console.log("data", data);
+  // console.log("data", data);
   // console.log("dataByUniqueID", dataByUniqueID);
   // console.log("dataByIESID", dataByIESID);
 
