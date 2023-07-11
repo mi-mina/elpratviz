@@ -24,7 +24,7 @@ const windowWidth = document.getElementById("graph").clientWidth;
 const svgWidth = 800 > windowWidth ? windowWidth : 800;
 const svgHeight = svgWidth;
 const songR = svgHeight * 0.006;
-const minStarR = svgHeight * 0.04;
+const minStarR = svgHeight * 0.045;
 const paddingR = svgHeight * 0.008;
 const paddingH = svgHeight * 0.01;
 let allSongsStarR;
@@ -266,7 +266,7 @@ function init(files) {
       .attr("id", "elPratText")
       .style("font", `${svgHeight * 0.017}px Roboto`)
       .style("fill", "#BDBDBD")
-      .text("El prat");
+      .text("El Prat de Llobregat");
 
     // IES Containers
     const ies = chartContainer
